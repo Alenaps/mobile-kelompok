@@ -1,7 +1,57 @@
 import 'package:flutter/material.dart';
 
+// Pastikan Anda sudah punya halaman login dengan route '/login'
+
 class DashboardPetugas extends StatelessWidget {
   const DashboardPetugas({super.key});
+
+  // Fungsi menampilkan dialog konfirmasi Logout
+  Future<void> _showLogoutConfirmation(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Pengguna harus tekan tombol
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Logout'),
+          content: const Text('Apakah Anda yakin ingin keluar dari akun?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Batal', 
+                style: TextStyle(color: Color(0xFF4CAF50)),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Tutup dialog
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFD32F2F), 
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Keluar',
+                style: TextStyle(
+                  color: Colors.white, 
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); 
+                Navigator.pushNamedAndRemoveUntil(
+                  context, 
+                  '/login', 
+                  (Route<dynamic> route) => false,
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +61,7 @@ class DashboardPetugas extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
+        automaticallyImplyLeading: false, // <-- Ini menonaktifkan tombol back default
         title: const Text(
           "Dashboard Petugas",
           style: TextStyle(
@@ -19,6 +70,16 @@ class DashboardPetugas extends StatelessWidget {
           ),
         ),
         iconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.logout, 
+              color: Color(0xFFD32F2F),
+            ),
+            tooltip: 'Logout',
+            onPressed: () => _showLogoutConfirmation(context),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -45,9 +106,9 @@ class DashboardPetugas extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.green.withValues(alpha: 0.1),
-                          blurRadius: 6,
-                          offset: const Offset(0, 4),
+                          color: Colors.green.withAlpha((0.1 * 255).round()),
+                          blurRadius: 6.0,
+                          offset: const Offset(0, 4.0),
                         ),
                       ],
                     ),
@@ -83,7 +144,7 @@ class DashboardPetugas extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          elevation: 2,
+                          elevation: 2.0,
                         ),
                         onPressed: () =>
                             Navigator.pushNamed(context, '/detailLaporan'),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class StatusLaporanScreen extends StatelessWidget {
   const StatusLaporanScreen({super.key});
 
-  // Data laporan ada ikon masing-masing
   final List<Map<String, dynamic>> laporanList = const [
     {
       "judul": "Fasilitas Rusak di Gedung B",
@@ -78,7 +77,7 @@ class StatusLaporanScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(6),
                     child: Image.asset(
-                      laporan["icon"], // ← icon sesuai laporan
+                      laporan["icon"],
                       fit: BoxFit.contain,
                     ),
                   ),

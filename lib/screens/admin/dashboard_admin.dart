@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-//import '../../widgets/menu_card.dart';
 import 'kelola_pengguna_screen.dart';
 import 'verifikasi_laporan_screen.dart';
 import 'pengaturan_screen.dart';
+import 'statistik_screen.dart'; // <-- Import StatistikScreen
 
 class DashboardAdmin extends StatelessWidget {
   const DashboardAdmin({super.key});
@@ -57,11 +57,10 @@ class DashboardAdmin extends StatelessWidget {
               icon: Icons.bar_chart_outlined,
               color: Colors.orangeAccent,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Statistik belum diimplementasikan"),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                // NAVIGASI KE HALAMAN STATISTIK
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const StatistikScreen()),
                 );
               },
             ),
@@ -99,8 +98,8 @@ class DashboardAdmin extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.15),
-              blurRadius: 8,
+              color: Colors.grey.withAlpha((0.15 * 255).round()),
+              blurRadius: 8.0,
               offset: const Offset(0, 3),
             ),
           ],
@@ -110,7 +109,7 @@ class DashboardAdmin extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircleAvatar(
-              backgroundColor: color.withValues(alpha: 0.15),
+              backgroundColor: color.withAlpha((0.15 * 255).round()),
               radius: 28,
               child: Icon(icon, color: color, size: 30),
             ),

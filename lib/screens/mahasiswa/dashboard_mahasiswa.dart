@@ -30,16 +30,19 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6FBF7),
       appBar: AppBar(
+        automaticallyImplyLeading: false,  // <-- MENGHILANGKAN TOMBOL BACK
         elevation: 1,
         backgroundColor: Colors.white,
-        title: Text(
-          _titles[_selectedIndex],
-          style: const TextStyle(
-            color: Color(0xFF4CAF50), // warna teal elegan
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+        title: _selectedIndex == 1
+            ? null
+            : Text(
+                _titles[_selectedIndex],
+                style: const TextStyle(
+                  color: Color(0xFF4CAF50),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Color(0xFF009688)),
         actions: [
@@ -67,7 +70,7 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withValues(alpha: 0.1),
+            color: Colors.teal.withAlpha(25),
             blurRadius: 12,
             offset: const Offset(0, -3),
           ),
