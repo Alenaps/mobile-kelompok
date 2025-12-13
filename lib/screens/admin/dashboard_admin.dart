@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'kelola_pengguna_screen.dart';
 import 'verifikasi_laporan_screen.dart';
 import 'pengaturan_screen.dart';
+import 'statistik_screen.dart'; // Import screen statistik yang baru
 
 class DashboardAdmin extends StatelessWidget {
   const DashboardAdmin({super.key});
@@ -57,10 +58,11 @@ class DashboardAdmin extends StatelessWidget {
               icon: Icons.bar_chart_outlined,
               color: Colors.orangeAccent,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Statistik belum diimplementasikan"),
-                    behavior: SnackBarBehavior.floating,
+                // Navigasi ke halaman statistik
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const StatistikScreen(),
                   ),
                 );
               },
