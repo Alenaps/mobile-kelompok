@@ -3,6 +3,53 @@ import 'package:flutter/material.dart';
 class DashboardPetugas extends StatelessWidget {
   const DashboardPetugas({super.key});
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Konfirmasi Logout",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            "Apakah Anda yakin ingin keluar dari akun ini?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                "Batal",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              },
+              child: const Text("Logout"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,6 +58,7 @@ class DashboardPetugas extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           "Dashboard Petugas",
           style: TextStyle(
@@ -18,8 +66,15 @@ class DashboardPetugas extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            color: Colors.red, // 🔴 WARNA MERAH
+            onPressed: () => _showLogoutDialog(context),
+          ),
+        ],
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -83,11 +138,11 @@ class DashboardPetugas extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          elevation: 2,
                         ),
                         onPressed: () =>
                             Navigator.pushNamed(context, '/detailLaporan'),
-                        icon: const Icon(Icons.visibility, color: Colors.white),
+                        icon:
+                            const Icon(Icons.visibility, color: Colors.white),
                         label: const Text(
                           "Lihat",
                           style: TextStyle(color: Colors.white),
