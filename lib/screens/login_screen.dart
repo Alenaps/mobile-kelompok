@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -8,7 +10,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String selectedRole = 'Mahasiswa';
+  final emailC = TextEditingController();
+  final passC = TextEditingController();
+
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    emailC.dispose();
+    passC.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,144 +30,17 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 80),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo / judul aplikasi
-              Column(
-                children: [
-                  Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.green.withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.school, size: 45, color: Colors.white),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "CampusCare",
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Color(0xFF2E7D32),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // const Text(
-                  //   "Aplikasi Pelaporan",
-                  //   textAlign: TextAlign.center,
-                  //   style: TextStyle(color: Colors.grey, fontSize: 14),
-                 // ),
-                ],
-              ),
-
+              _header(),
               const SizedBox(height: 50),
-
-              // Form input
-              Container(
-                padding: const EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha:0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildTextField(
-                      label: "Email",
-                      icon: Icons.email_outlined,
-                      hintText: "masukkan email anda",
-                    ),
-                    const SizedBox(height: 15),
-                    _buildTextField(
-                      label: "Password",
-                      icon: Icons.lock_outline,
-                      obscureText: true,
-                      hintText: "masukkan password anda",
-                    ),
-                    const SizedBox(height: 15),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedRole,
-                      decoration: InputDecoration(
-                        labelText: "Pilih Peran",
-                        prefixIcon: const Icon(Icons.account_circle_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: const Color(0xFFF1F8E9),
-                      ),
-                      items: ['Mahasiswa', 'Petugas', 'Admin']
-                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                          .toList(),
-                      onChanged: (val) => setState(() => selectedRole = val!),
-                    ),
-                    const SizedBox(height: 25),
-
-                    // Tombol login
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          if (selectedRole == 'Mahasiswa') {
-                            Navigator.pushReplacementNamed(context, '/dashboardMahasiswa');
-                          } else if (selectedRole == 'Petugas') {
-                            Navigator.pushReplacementNamed(context, '/dashboardPetugas');
-                          } else {
-                            Navigator.pushReplacementNamed(context, '/dashboardAdmin');
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 3,
-                        ),
-                        label: const Text(
-                          "Login",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
+              _form(),
               const SizedBox(height: 15),
-
               TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: const Text(
-                  "Belum punya akun? Daftar",
-                  style: TextStyle(
-                    color: Color(0xFF2E7D32),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/register'),
+                child: const Text("Belum punya akun? Daftar"),
               ),
-              
               const SizedBox(height: 30),
-
-              // Footer / teks tambahan
               const Text(
                 "©2025 CampusCare",
                 textAlign: TextAlign.center,
@@ -168,31 +53,128 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Widget helper biar input seragam dan rapi
-  Widget _buildTextField({
-    required String label,
-    required IconData icon,
-    String? hintText,
+  Widget _header() {
+    return const Column(
+      children: [
+        Icon(Icons.school, size: 80, color: Color(0xFF4CAF50)),
+        SizedBox(height: 15),
+        Text(
+          "CampusCare",
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2E7D32),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _form() {
+    return Container(
+      padding: const EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        children: [
+          _buildField(emailC, "Email", Icons.email_outlined),
+          const SizedBox(height: 15),
+          _buildField(
+            passC,
+            "Password",
+            Icons.lock_outline,
+            obscureText: true,
+          ),
+          const SizedBox(height: 25),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : _login,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4CAF50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text(
+                      "Login",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildField(
+    TextEditingController controller,
+    String label,
+    IconData icon, {
     bool obscureText = false,
   }) {
     return TextField(
+      controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: Colors.green.shade700),
+        prefixIcon: Icon(icon),
         labelText: label,
-        hintText: hintText,
-        labelStyle: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.w600),
         filled: true,
         fillColor: const Color(0xFFF1F8E9),
-        enabledBorder: OutlineInputBorder(
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.green.shade100),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.green.shade400, width: 1.8),
         ),
       ),
     );
+  }
+
+  Future<void> _login() async {
+    try {
+      setState(() => isLoading = true);
+
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailC.text.trim(),
+        password: passC.text,
+      );
+
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (!mounted) return; 
+
+      final role = doc.data()?['role'];
+
+      if (role == 'Mahasiswa') {
+        Navigator.pushReplacementNamed(
+            context, '/dashboardMahasiswa');
+      } else if (role == 'Petugas') {
+        Navigator.pushReplacementNamed(
+            context, '/dashboardPetugas');
+      } else {
+        Navigator.pushReplacementNamed(
+            context, '/dashboardAdmin');
+      }
+    } catch (e) {
+      if (!mounted) return; 
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 }

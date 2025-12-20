@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -8,7 +10,22 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final nameC = TextEditingController();
+  final emailC = TextEditingController();
+  final passC = TextEditingController();
+  final confirmPassC = TextEditingController();
+
   String selectedRole = 'Mahasiswa';
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    nameC.dispose();
+    emailC.dispose();
+    passC.dispose();
+    confirmPassC.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,30 +83,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   children: [
                     _buildTextField(
+                      controller: nameC,
                       label: "Nama Lengkap",
                       icon: Icons.person_outline,
                     ),
                     const SizedBox(height: 15),
                     _buildTextField(
+                      controller: emailC,
                       label: "Email",
                       icon: Icons.email_outlined,
                     ),
                     const SizedBox(height: 15),
                     _buildTextField(
+                      controller: passC,
                       label: "Password",
                       icon: Icons.lock_outline,
                       obscureText: true,
                     ),
                     const SizedBox(height: 15),
                     _buildTextField(
+                      controller: confirmPassC,
                       label: "Konfirmasi Password",
                       icon: Icons.lock_outline,
                       obscureText: true,
                     ),
                     const SizedBox(height: 15),
 
+                    // DROPDOWN ROLE
                     DropdownButtonFormField<String>(
-                      value: selectedRole,
+                      initialValue: selectedRole,
                       decoration: InputDecoration(
                         labelText: "Pilih Peran",
                         prefixIcon:
@@ -109,35 +131,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           value: 'Petugas',
                           child: Text('Petugas'),
                         ),
+                        DropdownMenuItem(
+                          value: 'Admin',
+                          child: Text('Admin'),
+                        ),
                       ],
                       onChanged: (val) {
-                        setState(() {
-                          selectedRole = val!;
-                        });
+                        if (val != null) {
+                          setState(() => selectedRole = val);
+                        }
                       },
                     ),
 
                     const SizedBox(height: 25),
 
+                    // BUTTON REGISTER
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: proses register (Firebase / API)
-                          Navigator.pop(context);
-                        },
+                        onPressed: isLoading ? null : _register,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF4CAF50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          "Daftar",
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 16),
-                        ),
+                        child: isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                "Daftar",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
                       ),
                     ),
                   ],
@@ -157,12 +187,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  // ===================== WIDGET FIELD =====================
   Widget _buildTextField({
+    required TextEditingController controller,
     required String label,
     required IconData icon,
     bool obscureText = false,
   }) {
     return TextField(
+      controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.green.shade700),
@@ -174,5 +207,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  // ===================== REGISTER LOGIC =====================
+  Future<void> _register() async {
+    if (passC.text != confirmPassC.text) {
+      _showMsg("Password tidak sama");
+      return;
+    }
+
+    try {
+      setState(() => isLoading = true);
+
+      final userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailC.text.trim(),
+        password: passC.text,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'name': nameC.text,
+        'email': emailC.text,
+        'role': selectedRole,
+        'createdAt': Timestamp.now(),
+      });
+
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      _showMsg(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
+
+  // ===================== SNACKBAR =====================
+  void _showMsg(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
   }
 }
