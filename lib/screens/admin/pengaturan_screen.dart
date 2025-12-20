@@ -61,7 +61,7 @@ class _ManajemenAkunScreenState extends State<ManajemenAkunScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.green.withOpacity(0.3),
+                        color: Colors.green.withValues(alpha: 0.3),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -81,7 +81,7 @@ class _ManajemenAkunScreenState extends State<ManajemenAkunScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(

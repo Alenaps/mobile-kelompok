@@ -137,6 +137,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
+              const SizedBox(height: 15),
+
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/register');
+                },
+                child: const Text(
+                  "Belum punya akun? Daftar",
+                  style: TextStyle(
+                    color: Color(0xFF2E7D32),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              
               const SizedBox(height: 30),
 
               // Footer / teks tambahan

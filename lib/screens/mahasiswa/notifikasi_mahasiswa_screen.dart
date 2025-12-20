@@ -55,7 +55,7 @@ class _NotifikasiMahasiswaScreenState extends State<NotifikasiMahasiswaScreen> {
                     : 'Notifikasi sedang nonaktif',
               ),
               value: _notifAktif,
-              activeColor: const Color(0xFF009688),
+              activeThumbColor: const Color(0xFF009688),
               onChanged: (value) => _toggleNotifikasi(),
             ),
           ),
