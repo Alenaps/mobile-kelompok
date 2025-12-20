@@ -63,18 +63,19 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
             : null,
 
         actions: [
-          IconButton(
-            icon: Icon(
-              _notifAktif
-                  ? Icons.notifications_active_outlined
-                  : Icons.notifications_off_outlined,
-              color: _notifAktif
-                  ? const Color(0xFF009688)
-                  : Colors.grey,
-            ),
-            onPressed: _toggleNotifikasi, // ⬅️ FUNGSI AKTIF
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_none,
+            color: Color(0xFF009688),
           ),
-        ],
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              '/notifikasimahasiswa',
+            );
+          },
+        ),
+      ],
       ),
 
       // ================= BODY =================
